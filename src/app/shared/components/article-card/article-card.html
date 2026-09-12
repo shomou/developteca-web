@@ -1,0 +1,23 @@
+<a [routerLink]="['/articulos', article.slug]" class="card">
+    <div class="card-image">
+        @if(article.featuredImage){
+            <img [src]="'http://localhost:8080' + article.featuredImage.imageUrl" [alt]="article.featuredImage.altText"/>
+        } @else{
+            <div class="placeholder"></div>
+        }
+    </div>
+
+    <div class="card-body">
+        <span class="category">{{ article.category.name }}</span>
+        <h3>{{ article.title }}</h3>
+        <p class="excerpt">{{ article.excerpt }}</p>
+
+        <div class="card-footer">
+            <span class="author">{{ article.author.firstName }} {{ article.author.lastName }}</span>
+            <div class="meta">
+                <span class="rating">⭐ {{ article.averageRating.toFixed(1) }}</span>
+                <span class="comments">💬 {{ article.commentsCount }}</span>
+            </div>
+        </div>
+    </div>
+</a>

@@ -1,0 +1,53 @@
+<div class="article-list-page">
+  <header class="page-header">
+    <h1>Todos los Artículos</h1>
+
+    <div class="filters">
+      <input
+        type="text"
+        placeholder="Buscar artículos..."
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange()"
+        class="search-input"
+      />
+
+      <select [(ngModel)]="selectedCategory" (ngModelChange)="loadArticles()" class="category-select">
+        <option value="">Todas las categorías</option>
+        <option value="backend">Backend</option>
+        <option value="frontend">Frontend</option>
+        <option value="devops">DevOps</option>
+        <option value="bases-de-datos">Bases de Datos</option>
+        <option value="buenas-practicas">Buenas Prácticas</option>
+      </select>
+    </div>
+  </header>
+
+  @if (isLoading()) {
+    <p class="loading">Cargando artículos...</p>
+  } @else if (articles().length === 0) {
+    <p class="empty">No se encontraron artículos.</p>
+  } @else {
+    <div class="articles-grid">
+      @for (article of articles(); track article.id) {
+        <app-article-card [article]="article" />
+      }
+    </div>
+
+    @if (totalPages() > 1) {
+      <nav class="pagination">
+        <button (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 0">← Anterior</button>
+
+        @for (page of pageNumbers; track page) {
+          <button
+            (click)="goToPage(page)"
+            [class.active]="page === currentPage()"
+          >
+            {{ page + 1 }}
+          </button>
+        }
+
+        <button (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() === totalPages() - 1">Siguiente →</button>
+      </nav>
+    }
+  }
+</div>

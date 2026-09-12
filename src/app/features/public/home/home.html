@@ -1,0 +1,50 @@
+<div class="home-page">
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Developteca</h1>
+            <p>Turepositorio de conocimiento sobre desarrollo de software</p>
+            <a routerLink="/articulos" class="cta-button">Explorar Articulos</a>
+        </div>
+    </section>
+
+    <!-- Destacados -->
+    <section class="section">
+        <h2>Artículos Destacados</h2>
+
+        @if (isLoading()) {
+        <p class="loading">Cargando...</p>
+        }@else if(featuredArticles().length === 0){
+        <p class="empty">Aún no hay artículos publicados.</p>
+        }@else {
+        <div class="articles-grid featured">
+            @for(article of featuredArticles(); track article.id){
+            <app-article-card [article]="article" />
+            }
+        </div>
+        }
+    </section>
+
+    <!-- Últimos artículos -->
+    <section class="section">
+        <h2>Últimos Artículos</h2>
+
+        @if(!isLoading() && latestArticles().length > 0){
+        <div class="artciles-grid">
+            @for(article of latestArticles(); track article.id){
+            <app-article-card [article]="article" />
+            }
+        </div>
+        }
+    </section>
+
+    <!-- Newsletter CTA (placeholder, se conecta en Sprint 5) -->
+    <section class="newsletter-cta">
+        <h2>Suscríbete al Newsletter</h2>
+        <p>Recibe los mejores artículos directamente en tu bandeja de entrada</p>
+        <div class="newsletter-form">
+            <input type="email" placeholder="tu@email.com" disabled />
+            <button disabled>Próximamente</button>
+        </div>
+    </section>
+</div>
