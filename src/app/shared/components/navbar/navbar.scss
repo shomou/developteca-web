@@ -1,0 +1,42 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+
+  .brand {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #4f46e5;
+    text-decoration: none;
+  }
+
+  .links {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+
+    a {
+      color: #475569;
+      text-decoration: none;
+      font-size: 0.95rem;
+
+      &.active {
+        color: #4f46e5;
+        font-weight: 600;
+      }
+    }
+
+    button {
+      background: none;
+      border: 1px solid #cbd5e1;
+      border-radius: 0.5rem;
+      padding: 0.4rem 0.9rem;
+      cursor: pointer;
+      color: #475569;
+      font-size: 0.9rem;
+    }
+  }
+}

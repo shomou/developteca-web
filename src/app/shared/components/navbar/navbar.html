@@ -1,0 +1,17 @@
+<nav class="navbar">
+  <a routerLink="/" class="brand">Developteca</a>
+
+  <div class="links">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
+    <a routerLink="/articulos" routerLinkActive="active">Artículos</a>
+
+    @if (authService.isAuthenticated()) {
+      @if (authService.isAdmin()) {
+        <a routerLink="/admin/dashboard" routerLinkActive="active">Dashboard</a>
+      }
+      <button (click)="onLogout()">Cerrar sesión</button>
+    } @else {
+      <a routerLink="/login" routerLinkActive="active">Iniciar sesión</a>
+    }
+  </div>
+</nav>
