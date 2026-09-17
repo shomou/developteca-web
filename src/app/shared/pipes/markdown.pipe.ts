@@ -13,6 +13,7 @@ import yaml from 'highlight.js/lib/languages/yaml';
 import json from 'highlight.js/lib/languages/json';
 import bash from 'highlight.js/lib/languages/bash';
 import plaintext from 'highlight.js/lib/languages/plaintext';
+import peoplecode from './peoplecode.language';
 
 // Solo los lenguajes que el blog usa: el bundle completo de highlight.js pesa ~1MB.
 // plaintext es obligatorio: es el fallback para bloques sin lenguaje o con uno no registrado.
@@ -28,6 +29,7 @@ hljs.registerLanguage('sql', sql);
 hljs.registerLanguage('yaml', yaml);
 hljs.registerLanguage('json', json);
 hljs.registerLanguage('bash', bash);
+hljs.registerLanguage('peoplecode', peoplecode);
 
 const marked = new Marked(
   markedHighlight({
