@@ -8,6 +8,7 @@
     @if (authService.isAuthenticated()) {
       @if (authService.isAdmin()) {
         <a routerLink="/admin/dashboard" routerLinkActive="active">Dashboard</a>
+        <a routerLink="/admin/articulos" routerLinkActive="active">Gestionar</a>
       }
       <button (click)="onLogout()">Cerrar sesión</button>
     } @else {

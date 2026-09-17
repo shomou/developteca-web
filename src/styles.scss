@@ -1,18 +1,10 @@
-/* ============================================================
-   Tokens de diseño — Developteca
-   ------------------------------------------------------------
-   Custom properties de CSS (no variables SCSS) a propósito:
-   se heredan por el DOM, así que están disponibles en todos los
-   componentes sin necesidad de un @use en cada archivo .scss.
-   ============================================================ */
-
 :root {
   /* ===== Marca ===== */
   --color-primary: #4f46e5;
   --color-primary-hover: #4338ca;
   --color-primary-surface: #eef2ff;
 
-  /* ===== Texto ===== */
+    /* ===== Texto ===== */
   --color-heading: #1e293b;
   --color-text: #334155;
   --color-text-muted: #64748b;
@@ -26,11 +18,13 @@
   --color-border: #e2e8f0;
   --color-border-strong: #cbd5e1;
 
-  /* ===== Estados ===== */
+/* ===== Estados ===== */
   --color-danger: #b91c1c;
   --color-danger-surface: #fef2f2;
   --color-warning: #92400e;
   --color-warning-surface: #fef3c7;
+  --color-success: #15803d;
+  --color-success-surface: #dcfce7;
   --color-star: #f59e0b;
   --color-star-hover: #fbbf24;
 
@@ -48,4 +42,5 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
   --shadow-md: 0 4px 12px -4px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+
 }

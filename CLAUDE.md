@@ -60,7 +60,18 @@ The user is learning Angular hands-on and is intermediate level. Claude acts as 
 
 **Before resuming work after any gap in the conversation, verify the actual files on disk** (find/read) rather than trusting this document's "done" status below — previously instructed changes (a whole login page, a guard, a navbar) were narrated as complete but never actually saved to disk before a migration, and the gap wasn't caught until files were checked directly.
 
-## Implementation status (source of truth: verified on disk 2026-09-16)
+## Implementation status (source of truth: verified on disk 2026-09-17)
+
+### Done — Bloque A: publishing from the web (admin area)
+Until this, the backend's full article CRUD had no UI — publishing was Insomnia-only.
+- `ArticleService` gained `listForManagement`, `getForEdit`, `create`, `update`, `delete`, `uploadImage`, `deleteImage`; models gained `ArticleCreateRequest` (`status` optional, backend defaults `DRAFT`) and `ArticleUpdateRequest` (`status` required — mirrors the backend's `@NotNull`).
+- `uploadImage` sends `FormData` **without** a `Content-Type` header on purpose: the browser must generate the multipart boundary itself. Setting the header manually yields a 400 even with a valid file.
+- `features/admin/article-manage` (`/admin/articulos`) — table of all statuses via `GET /articles/manage`, status filter, native `confirm()` before delete (deletion also removes image files server-side).
+- `features/admin/article-editor` — one component for `/admin/articulos/nuevo` and `/admin/articulos/editar/:id`; mode is decided by the presence of `:id` (`route.snapshot`, since you never navigate editor→editor). After **create** it redirects to `/editar/:id` rather than the list, because image upload needs a persisted `articleId`. Uses `[ngValue]` for `categoryId` so the model keeps a `number`, not `"1"`.
+- `features/admin/article-image-manager` — rendered **outside** the editor's `<form>` (nested forms are invalid HTML; the inner submit would trigger the outer save). Validates type/size client-side for UX; the backend remains the real gate. Uploading is **additive** — a new image never replaces an old one; each card has its own delete.
+- Navbar admin link is labeled "Gestionar" to avoid two "Artículos" entries.
+- Added `--color-success` / `--color-success-surface` tokens for the status badges.
+- Pending nicety: no button to mark an *existing* image as featured (backend has no endpoint for it) — delete and re-upload for now.
 
 ### Done — Sprint 4 (Comments & Ratings)
 - `core/models/comment.model.ts` (`Comment` with recursive `replies`, `CommentCreateRequest`, `CommentStatus`) and `core/models/rating.model.ts` (`RatingResponse` with nullable `myRating`) — both reuse `Author` from `article.model.ts`

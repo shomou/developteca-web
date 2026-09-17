@@ -1,0 +1,56 @@
+<section class="image-manager">
+  <h2>Imágenes</h2>
+
+  @if (errorMessage()) {
+    <p class="error">{{ errorMessage() }}</p>
+  }
+
+  <div class="upload-box">
+    <input
+      #fileInput
+      type="file"
+      accept="image/jpeg,image/png,image/webp"
+      (change)="onFileSelected($event)"
+    />
+
+    <input
+      type="text"
+      name="altText"
+      [(ngModel)]="altText"
+      placeholder="Texto alternativo (qué muestra la imagen)"
+    />
+
+    <label class="checkbox">
+      <input type="checkbox" name="isFeatured" [(ngModel)]="isFeatured" />
+      Marcar como destacada (portada del artículo)
+    </label>
+
+    <button
+      type="button"
+      class="btn-primary"
+      [disabled]="!selectedFile || isUploading()"
+      (click)="onUpload(fileInput)"
+    >
+      {{ isUploading() ? 'Subiendo...' : 'Subir imagen' }}
+    </button>
+  </div>
+
+  @if (images().length === 0) {
+    <p class="state-message">Este artículo aún no tiene imágenes.</p>
+  } @else {
+    <div class="image-grid">
+      @for (image of images(); track image.id) {
+        <figure class="image-card">
+          <img [src]="apiBase + image.imageUrl" [alt]="image.altText" />
+          <figcaption>
+            @if (image.isFeatured) {
+              <span class="badge">Destacada</span>
+            }
+            <span class="alt">{{ image.altText || 'Sin texto alternativo' }}</span>
+            <button type="button" class="danger" (click)="onDelete(image)">Eliminar</button>
+          </figcaption>
+        </figure>
+      }
+    </div>
+  }
+</section>

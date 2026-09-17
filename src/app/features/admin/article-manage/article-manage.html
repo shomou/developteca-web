@@ -1,0 +1,69 @@
+<div class="manage-page">
+  <header class="page-header">
+    <h1>Gestión de artículos</h1>
+    <a routerLink="/admin/articulos/nuevo" class="btn-primary">+ Nuevo artículo</a>
+  </header>
+
+  <div class="filters">
+    <select [(ngModel)]="selectedStatus" (ngModelChange)="onStatusChange()">
+      <option value="">Todos los estados</option>
+      <option value="DRAFT">Borradores</option>
+      <option value="PUBLISHED">Publicados</option>
+      <option value="ARCHIVED">Archivados</option>
+    </select>
+  </div>
+
+  @if (errorMessage()) {
+    <p class="error">{{ errorMessage() }}</p>
+  }
+
+  @if (isLoading()) {
+    <p class="state-message">Cargando...</p>
+  } @else if (articles().length === 0) {
+    <p class="state-message">No hay artículos que mostrar.</p>
+  } @else {
+    <table class="articles-table">
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Categoría</th>
+          <th>Estado</th>
+          <th>Vistas</th>
+          <th>Publicado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (article of articles(); track article.id) {
+          <tr>
+            <td class="title-cell">{{ article.title }}</td>
+            <td>{{ article.category.name }}</td>
+            <td>
+              <span class="badge" [class]="'badge-' + article.status.toLowerCase()">
+                {{ article.status }}
+              </span>
+            </td>
+            <td>{{ article.viewsCount }}</td>
+            <td>
+              {{ article.publishedAt ? (article.publishedAt | date: 'dd/MM/yyyy') : '—' }}
+            </td>
+            <td class="actions-cell">
+              <a [routerLink]="['/admin/articulos/editar', article.id]">Editar</a>
+              <button type="button" class="danger" (click)="onDelete(article)">Eliminar</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (totalPages() > 1) {
+      <nav class="pagination">
+        <button (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 0">← Anterior</button>
+        @for (page of pageNumbers; track page) {
+          <button (click)="goToPage(page)" [class.active]="page === currentPage()">{{ page + 1 }}</button>
+        }
+        <button (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() === totalPages() - 1">Siguiente →</button>
+      </nav>
+    }
+  }
+</div>

@@ -1,0 +1,53 @@
+<div class="editor-page">
+  <a routerLink="/admin/articulos" class="back-link">← Volver a gestión</a>
+
+  <h1>{{ isEditMode() ? 'Editar artículo' : 'Nuevo artículo' }}</h1>
+
+  @if (isLoading()) {
+    <p class="state-message">Cargando...</p>
+  } @else {
+    <form class="editor-form" (ngSubmit)="onSubmit()">
+      @if (errorMessage()) {
+        <p class="error">{{ errorMessage() }}</p>
+      }
+
+      <label for="title">Título</label>
+      <input id="title" name="title" type="text" [(ngModel)]="title" required minlength="3" maxlength="255" />
+
+      <div class="row">
+        <div class="field">
+          <label for="category">Categoría</label>
+          <select id="category" name="category" [(ngModel)]="categoryId" required>
+            <option [ngValue]="null" disabled>Selecciona una categoría</option>
+            @for (category of categories(); track category.id) {
+              <option [ngValue]="category.id">{{ category.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="status">Estado</label>
+          <select id="status" name="status" [(ngModel)]="status">
+            <option value="DRAFT">Borrador</option>
+            <option value="PUBLISHED">Publicado</option>
+            <option value="ARCHIVED">Archivado</option>
+          </select>
+        </div>
+      </div>
+
+      <label for="content">Contenido</label>
+      <textarea id="content" name="content" [(ngModel)]="content" rows="16" required></textarea>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="isSaving()">
+          {{ isSaving() ? 'Guardando...' : (isEditMode() ? 'Guardar cambios' : 'Crear artículo') }}
+        </button>
+      </div>
+    </form>
+    @if (isEditMode()) {
+      <app-article-image-manager [articleId]="articleId()!" />
+    } @else {
+      <p class="hint">Guarda el artículo primero para poder subirle imágenes.</p>
+    }
+  }
+</div>

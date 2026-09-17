@@ -60,3 +60,17 @@ export interface Page<T>{
     number: number; // página actual
     size: number;
 }
+
+export interface ArticleCreateRequest {
+  title: string;
+  content: string;
+  categoryId: number;
+  status?: ArticleStatus;
+}
+
+export interface ArticleUpdateRequest {
+  title: string;
+  content: string;
+  categoryId: number;
+  status: ArticleStatus;
+}
