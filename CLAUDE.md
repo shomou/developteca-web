@@ -40,6 +40,12 @@ ng generate guard <path> --skip-tests
 
 **No component `.scss` should contain a raw hex color, a literal `border-radius` size, or a `box-shadow` value.** Use `var(--color-*)`, `var(--radius-*)`, `var(--shadow-*)`. Spacing (`padding`, `gap`, `margin`) is deliberately *not* tokenized — it legitimately varies per component and forcing a scale there adds noise without consistency gains.
 
+**Typography:** the whole site is monospace by design — JetBrains Mono, self-hosted via `@fontsource/jetbrains-mono` (weights 400/400i/500/600/700 listed in `angular.json` `styles`, not fetched from Google). `--font-mono`, `--font-body` and `--font-heading` are tokens; today body and heading both resolve to mono. If long-form prose ever feels tiring, point `--font-body` at a sans stack — one line, no component changes. `html { font-size: 15px }` compensates for mono's wider glyphs. `button, input, select, textarea { font-family: inherit }` is required: form controls never inherit the page font on their own.
+
+**Markdown rendering (`shared/pipes/markdown.pipe.ts`):** `marked` + `marked-highlight` + `highlight.js/lib/core` with only the languages the blog uses registered (the full `highlight.js` import is ~1MB). **`plaintext` must stay registered** — it's the fallback for fences with no language or an unknown one; without it `hljs.highlight` throws `Unknown language: "plaintext"`, the pipe throws, and the entire article body renders blank with no on-screen error (this happened). The pipe returns a plain `string` and relies on Angular's `[innerHTML]` sanitizer — do not `bypassSecurityTrustHtml`; the sanitizer keeps `class` attributes so highlighting survives. Rendered-content styles live in the **global** `.markdown-body` block in `styles.scss`, because injected HTML lacks Angular's `_ngcontent` attributes and component-scoped styles can't reach it. The highlight theme (`github.css`) is also global via `angular.json`.
+
+**`angular.json` edits are not hot-reloaded.** Adding a stylesheet to `styles` (theme, fonts) only takes effect after restarting `ng serve` — the symptom is code blocks with correct `hljs-*` classes but no colors, or the font silently not loading. Installing new npm packages while `ng serve` runs also leaves Vite with a stale dep cache (`504 Outdated Optimize Dep`); a restart fixes both.
+
 This was retrofitted after two generations of components had drifted apart: the earlier ones (`article-card`, `home`, `article-list`) used indigo-500 `#6366f1` and slate-900 `#0f172a`, while later ones used indigo-600 `#4f46e5` and slate-800 `#1e293b` — so the navbar and the pagination buttons were visibly different indigos. Radii had the same problem in two notations (`0.5rem` and `8px` are the same 8px). Everything is consolidated now; verify with `grep -rn "#[0-9a-fA-F]\{3,6\}" src/ --include=*.scss`, which should match only `styles.scss`.
 
 ## Angular 21 naming gotcha
@@ -72,6 +78,7 @@ Until this, the backend's full article CRUD had no UI — publishing was Insomni
 - Navbar admin link is labeled "Gestionar" to avoid two "Artículos" entries.
 - Added `--color-success` / `--color-success-surface` tokens for the status badges.
 - Pending nicety: no button to mark an *existing* image as featured (backend has no endpoint for it) — delete and re-upload for now.
+- **A6 — Markdown:** article `content` is Markdown, rendered in `article-detail` via `[innerHTML]="content | markdown"` and previewable in the editor ("Vista previa" toggle, same pipe). The backend strips Markdown syntax when building the card `excerpt` (`MarkdownUtil.toPlainText`). Authoring note: don't start the body with a `## <title>` heading — the page already renders `article.title` as the `<h1>`, so it shows twice.
 
 ### Done — Sprint 4 (Comments & Ratings)
 - `core/models/comment.model.ts` (`Comment` with recursive `replies`, `CommentCreateRequest`, `CommentStatus`) and `core/models/rating.model.ts` (`RatingResponse` with nullable `myRating`) — both reuse `Author` from `article.model.ts`

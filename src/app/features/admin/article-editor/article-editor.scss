@@ -68,6 +68,48 @@
   .form-actions {
     margin-top: 1.5rem;
   }
+
+  .content-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+
+    label {
+      margin-top: 0;
+    }
+
+    .markdown-hint {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+
+      code {
+        background: var(--color-surface-sunken);
+        padding: 0.05rem 0.3rem;
+        border-radius: var(--radius-sm);
+      }
+    }
+
+    .toggle-preview {
+      margin-left: auto;
+      background: none;
+      border: 1px solid var(--color-border-strong);
+      border-radius: var(--radius-sm);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      color: var(--color-primary);
+    }
+  }
+
+  .preview {
+    min-height: 20rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-alt);
+  }
 }
 
 .btn-primary {

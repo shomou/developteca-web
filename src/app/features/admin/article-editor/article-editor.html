@@ -35,8 +35,21 @@
         </div>
       </div>
 
-      <label for="content">Contenido</label>
-      <textarea id="content" name="content" [(ngModel)]="content" rows="16" required></textarea>
+      <div class="content-header">
+        <label for="content">Contenido</label>
+        <span class="markdown-hint">
+          Acepta Markdown: <code>## título</code>, <code>**negrita**</code>, <code>```java</code>
+        </span>
+        <button type="button" class="toggle-preview" (click)="showPreview.set(!showPreview())">
+          {{ showPreview() ? 'Editar' : 'Vista previa' }}
+        </button>
+      </div>
+
+      @if (showPreview()) {
+        <div class="preview markdown-body" [innerHTML]="content | markdown"></div>
+      } @else {
+        <textarea id="content" name="content" [(ngModel)]="content" rows="16" required></textarea>
+      }
 
       <div class="form-actions">
         <button type="submit" class="btn-primary" [disabled]="isSaving()">

@@ -5,15 +5,17 @@ import { ArticleService } from '../../../core/services/article.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { ArticleStatus, Category } from '../../../core/models/article.model';
 import { ArticleImageManager } from '../article-image-manager/article-image-manager';
+import { MarkdownPipe } from '../../../shared/pipes/markdown.pipe';
 
 @Component({
   selector: 'app-article-editor',
   standalone: true,
-  imports: [FormsModule, RouterLink, ArticleImageManager],
+  imports: [FormsModule, RouterLink, ArticleImageManager, MarkdownPipe],
   templateUrl: './article-editor.html',
   styleUrl: './article-editor.scss',
 })
 export class ArticleEditor implements OnInit {
+  showPreview = signal(false);
   articleId = signal<number | null>(null);
   categories = signal<Category[]>([]);
   isLoading = signal(false);

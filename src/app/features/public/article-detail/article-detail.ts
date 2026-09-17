@@ -4,11 +4,12 @@ import { ArticleService } from '../../../core/services/article.service';
 import { ArticleDetail as ArticleDetailModel } from '../../../core/models/article.model';
 import { CommentSection } from '../../../shared/components/comment-section/comment-section';
 import { ArticleRating } from '../../../shared/components/article-rating/article-rating';
+import { MarkdownPipe } from '../../../shared/pipes/markdown.pipe';
 
 @Component({
   selector: 'app-article-detail',
   standalone: true,
-  imports: [RouterLink, CommentSection, ArticleRating],
+  imports: [RouterLink, CommentSection, ArticleRating, MarkdownPipe],
   templateUrl: './article-detail.html',
   styleUrl: './article-detail.scss',
 })
