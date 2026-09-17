@@ -36,7 +36,6 @@
               "node_modules/@fontsource/jetbrains-mono/500.css",
               "node_modules/@fontsource/jetbrains-mono/600.css",
               "node_modules/@fontsource/jetbrains-mono/700.css",
-              "node_modules/highlight.js/styles/github.css",
               "src/styles.scss"
             ]
           },

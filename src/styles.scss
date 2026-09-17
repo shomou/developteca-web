@@ -31,6 +31,24 @@
   /* ===== Decorativo ===== */
   --gradient-hero: linear-gradient(135deg, #0f172a 0%, #312e81 100%);
 
+  /* ===== Bloques de código (oscuros sobre página clara; mismo slate-900 que el hero) ===== */
+  --color-code-bg: #0f172a;
+  --color-code-border: #1e293b;
+  --color-code-text: #e2e8f0;
+
+  /* Paleta de sintaxis. Todos ≥ 6.9:1 de contraste sobre --color-code-bg (AA exige 4.5). */
+  --code-comment: #94a3b8;
+  --code-keyword: #fda4af;
+  --code-type: #fcd34d;
+  --code-builtin: #c4b5fd;
+  --code-variable: #7dd3fc;
+  --code-variable-lang: #67e8f9;
+  --code-string: #86efac;
+  --code-number: #fdba74;
+  --code-symbol: #f0abfc;
+  --code-title: #93c5fd;
+  --code-meta: #fef08a;
+
   /* ===== Radios ===== */
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
@@ -127,14 +145,64 @@ button, input, select, textarea {
     padding: 1rem 1.25rem;
     border-radius: var(--radius-md);
     overflow-x: auto;
-    border: 1px solid var(--color-border);
+    background: var(--color-code-bg);
+    border: 1px solid var(--color-code-border);
+    color: var(--color-code-text);
 
     code {
-      background: none;
+      background: transparent;
+      color: inherit;
       padding: 0;
       font-size: 0.875rem;
       line-height: 1.6;
     }
+
+    /* Mapeo de scopes de highlight.js a la paleta de tokens. Sustituye al archivo
+       de tema de highlight.js: así los colores viven en el sistema de diseño y se
+       ajustan en caliente sin tocar angular.json. */
+    .hljs-comment,
+    .hljs-quote { color: var(--code-comment); font-style: italic; }
+
+    .hljs-keyword,
+    .hljs-selector-tag,
+    .hljs-doctag { color: var(--code-keyword); }
+
+    .hljs-type,
+    .hljs-class .hljs-title { color: var(--code-type); }
+
+    .hljs-built_in { color: var(--code-builtin); }
+
+    .hljs-variable,
+    .hljs-template-variable,
+    .hljs-attr,
+    .hljs-attribute,
+    .hljs-property { color: var(--code-variable); }
+
+    .hljs-variable.language_ { color: var(--code-variable-lang); }
+
+    .hljs-string,
+    .hljs-regexp,
+    .hljs-addition { color: var(--code-string); }
+
+    .hljs-number,
+    .hljs-literal { color: var(--code-number); }
+
+    .hljs-symbol,
+    .hljs-selector-id,
+    .hljs-selector-class { color: var(--code-symbol); }
+
+    .hljs-title,
+    .hljs-title.function_,
+    .hljs-title.class_,
+    .hljs-section,
+    .hljs-name { color: var(--code-title); }
+
+    .hljs-meta,
+    .hljs-meta .hljs-keyword { color: var(--code-meta); }
+
+    .hljs-deletion { color: var(--code-keyword); }
+    .hljs-emphasis { font-style: italic; }
+    .hljs-strong { font-weight: 700; }
   }
 
   img {
@@ -143,18 +211,43 @@ button, input, select, textarea {
   }
 
   table {
-    border-collapse: collapse;
-    margin: 1rem 0;
     width: 100%;
-
-    th, td {
-      border: 1px solid var(--color-border);
-      padding: 0.5rem 0.75rem;
-      text-align: left;
-    }
+    margin: 1.25rem 0;
+    /* separate + spacing 0 (no collapse): border-radius no funciona con border-collapse */
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    font-size: 0.9rem;
 
     th {
+      background: var(--color-code-bg);
+      color: var(--color-code-text);
+      font-weight: 600;
+      text-align: left;
+      padding: 0.65rem 0.9rem;
+      letter-spacing: 0.02em;
+    }
+
+    td {
+      padding: 0.6rem 0.9rem;
+      border-top: 1px solid var(--color-border);
+      vertical-align: top;
+    }
+
+    tbody tr:nth-child(even) td {
       background: var(--color-surface-alt);
+    }
+
+    th + th,
+    td + td {
+      border-left: 1px solid var(--color-border);
+    }
+
+    th + th {
+      border-left-color: var(--color-code-border);
     }
   }
 
