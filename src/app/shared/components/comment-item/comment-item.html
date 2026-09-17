@@ -1,0 +1,40 @@
+<div class="comment" [class.is-hidden]="isHidden()">
+  <div class="comment-header">
+    <span class="author">{{ comment.author.firstName }} {{ comment.author.lastName }}</span>
+    <span class="date">{{ comment.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+    @if (isHidden()) {
+      <span class="hidden-badge">Oculto</span>
+    }
+  </div>
+
+  <p class="content">{{ comment.content }}</p>
+
+  <div class="actions">
+    @if (authService.isAuthenticated() && !isHidden()) {
+      <button type="button" (click)="replyRequested.emit(comment)">Responder</button>
+    }
+
+    @if (authService.isAdmin()) {
+      <button type="button" (click)="moderateRequested.emit(comment)">
+        {{ isHidden() ? 'Restaurar' : 'Ocultar' }}
+      </button>
+    }
+
+    @if (canDelete()) {
+      <button type="button" class="danger" (click)="deleteRequested.emit(comment)">Eliminar</button>
+    }
+  </div>
+
+  @if (comment.replies.length > 0) {
+    <div class="replies">
+      @for (child of comment.replies; track child.id) {
+        <app-comment-item
+          [comment]="child"
+          (replyRequested)="replyRequested.emit($event)"
+          (deleteRequested)="deleteRequested.emit($event)"
+          (moderateRequested)="moderateRequested.emit($event)"
+        />
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,72 @@
+.comment {
+  padding: 1rem 0;
+  border-top: 1px solid #e2e8f0;
+
+  .comment-header {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    margin-bottom: 0.35rem;
+
+    .author {
+      font-weight: 600;
+      color: #1e293b;
+      font-size: 0.95rem;
+    }
+
+    .date {
+      color: #94a3b8;
+      font-size: 0.8rem;
+    }
+  }
+
+  .content {
+    color: #334155;
+    line-height: 1.6;
+    margin: 0 0 0.5rem;
+    white-space: pre-wrap;
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.75rem;
+
+    button {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      font-size: 0.8rem;
+      color: #4f46e5;
+
+      &.danger {
+        color: #b91c1c;
+      }
+    }
+  }
+
+  .replies {
+    margin-left: 1.5rem;
+    padding-left: 1rem;
+    border-left: 2px solid #eef2ff;
+  }
+
+    &.is-hidden {
+    opacity: 0.55;
+
+    .content {
+      font-style: italic;
+    }
+  }
+
+  .hidden-badge {
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.1rem 0.45rem;
+    border-radius: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+}

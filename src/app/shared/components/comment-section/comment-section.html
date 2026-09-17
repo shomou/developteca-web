@@ -1,0 +1,51 @@
+<section class="comments">
+  <h2>Comentarios</h2>
+
+  @if (authService.isAuthenticated()) {
+    <form class="comment-form" (ngSubmit)="onSubmit()">
+      @if (replyingTo()) {
+        <div class="replying-banner">
+          Respondiendo a <strong>{{ replyingTo()!.author.firstName }}</strong>
+          <button type="button" (click)="cancelReply()">Cancelar</button>
+        </div>
+      }
+
+      <textarea
+        name="newComment"
+        [(ngModel)]="newComment"
+        rows="3"
+        placeholder="Escribe tu comentario..."
+        required
+      ></textarea>
+
+      @if (errorMessage()) {
+        <p class="error">{{ errorMessage() }}</p>
+      }
+
+      <button type="submit" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Publicando...' : 'Publicar comentario' }}
+      </button>
+    </form>
+  } @else {
+    <p class="login-hint">
+      <a routerLink="/login">Inicia sesión</a> para dejar un comentario.
+    </p>
+  }
+
+  @if (isLoading()) {
+    <p class="state-message">Cargando comentarios...</p>
+  } @else if (comments().length === 0) {
+    <p class="state-message">Todavía no hay comentarios. ¡Sé el primero!</p>
+  } @else {
+    <div class="comment-list">
+      @for (comment of comments(); track comment.id) {
+        <app-comment-item
+          [comment]="comment"
+          (replyRequested)="onReplyRequested($event)"
+          (deleteRequested)="onDeleteRequested($event)"
+          (moderateRequested)="onModerateRequested($event)"
+        />
+      }
+    </div>
+  }
+</section>

@@ -3,6 +3,8 @@ import { FormsModule } from '@angular/forms'
 import { ArticleService } from '../../../core/services/article.service'; 
 import { ArticleSummary, Page } from '../../../core/models/article.model';
 import { ArticleCard } from '../../../shared/components/article-card/article-card';
+import { Category } from '../../../core/models/article.model';
+import { CategoryService } from '../../../core/services/category.service'
 
 @Component({
   selector: 'app-article-list',
@@ -22,12 +24,19 @@ export class ArticleList implements OnInit{
   searchTerm = '';
   selectedCategory = '';
 
+  categories = signal<Category[]>([]);
+
   private searchTimeout: any;
 
-  constructor(private articleService: ArticleService){}
+
+  constructor(
+    private articleService: ArticleService,
+    private categoryService: CategoryService
+  ){}
 
   ngOnInit(): void{
     this.loadArticles();
+    this.loadCategories();
   }
 
   loadArticles(): void{
@@ -69,5 +78,11 @@ export class ArticleList implements OnInit{
 
   get pageNumbers(): number[]{
     return Array.from({length: this.totalPages()}, (_,i) => i);
+  }
+
+  private loadCategories(): void {
+    this.categoryService.list().subscribe({
+      next: (res) => this.categories.set(res.data)
+    });
   }
 }

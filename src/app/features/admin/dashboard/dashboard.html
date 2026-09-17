@@ -1,0 +1,73 @@
+@if (isLoading()){
+    <p class="state-message">Cargando estadísticas...</p>
+} @else if(stats()){
+    <div class="dashboard">
+    <h1>Dashboard</h1>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="value">{{ stats()!.totalArticles }}</span>
+        <span class="label">Artículos totales</span>
+      </div>
+      <div class="stat-card">
+        <span class="value">{{ stats()!.publishedArticles }}</span>
+        <span class="label">Publicados</span>
+      </div>
+      <div class="stat-card">
+        <span class="value">{{ stats()!.draftArticles }}</span>
+        <span class="label">Borradores</span>
+      </div>
+      <div class="stat-card">
+        <span class="value">{{ stats()!.archivedArticles }}</span>
+        <span class="label">Archivados</span>
+      </div>
+      <div class="stat-card">
+        <span class="value">{{ stats()!.totalViews }}</span>
+        <span class="label">Vistas totales</span>
+      </div>
+      <div class="stat-card">
+        <span class="value">{{ stats()!.totalComments }}</span>
+        <span class="label">Comentarios</span>
+      </div>
+      <div class="stat-card">
+        <span class="value">⭐ {{ stats()!.averageRatingOverall.toFixed(1) }}</span>
+        <span class="label">Rating promedio</span>
+      </div>
+    </div>
+  </div><div class="dashboard">
+    <h1>Dashboard</h1>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="value">{{ stats()!.totalArticles }}</span>
+        <span class="label">Artículos totales</span>
+      </div>
+      <div class="stat-card">
+        <span class="value">{{ stats()!.publishedArticles }}</span>
+        <span class="label">Publicados</span>
+      </div>
+      <div class="stat-card">
+        <span class="value">{{ stats()!.draftArticles }}</span>
+        <span class="label">Borradores</span>
+      </div>
+      <div class="stat-card">
+        <span class="value">{{ stats()!.archivedArticles }}</span>
+        <span class="label">Archivados</span>
+      </div>
+      <div class="stat-card">
+        <span class="value">{{ stats()!.totalViews }}</span>
+        <span class="label">Vistas totales</span>
+      </div>
+      <div class="stat-card">
+        <span class="value">{{ stats()!.totalComments }}</span>
+        <span class="label">Comentarios</span>
+      </div>
+      <div class="stat-card">
+        <span class="value">⭐ {{ stats()!.averageRatingOverall.toFixed(1) }}</span>
+        <span class="label">Rating promedio</span>
+      </div>
+    </div>
+  </div>
+} @else{
+    <p class="state-message">No se pudieron cargar las estadísticas.</p>
+}

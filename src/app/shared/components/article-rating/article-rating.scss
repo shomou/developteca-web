@@ -1,0 +1,80 @@
+.rating {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1rem 1.25rem;
+  background: #f8fafc;
+  border-radius: 0.75rem;
+  margin: 1.5rem 0;
+
+  .average {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+
+    .score {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #f59e0b;
+    }
+  }
+
+  .label {
+    font-size: 0.85rem;
+    color: #64748b;
+  }
+
+  .my-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .stars {
+    display: flex;
+    gap: 0.15rem;
+  }
+
+  .star {
+    background: none;
+    border: none;
+    padding: 0 0.1rem;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    color: #cbd5e1;
+    transition: color 0.15s ease;
+
+    &.filled {
+      color: #f59e0b;
+    }
+
+    &:hover:not(:disabled) {
+      color: #fbbf24;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  .error {
+    background: #fef2f2;
+    color: #b91c1c;
+    padding: 0.4rem 0.7rem;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    margin: 0;
+  }
+
+  .login-hint {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin: 0;
+
+    a {
+      color: #4f46e5;
+    }
+  }
+}

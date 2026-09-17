@@ -11,13 +11,15 @@
         class="search-input"
       />
 
-      <select [(ngModel)]="selectedCategory" (ngModelChange)="loadArticles()" class="category-select">
+      <select
+        [(ngModel)]="selectedCategory"
+        (ngModelChange)="loadArticles()"
+        class="category-select"
+      >
         <option value="">Todas las categorías</option>
-        <option value="backend">Backend</option>
-        <option value="frontend">Frontend</option>
-        <option value="devops">DevOps</option>
-        <option value="bases-de-datos">Bases de Datos</option>
-        <option value="buenas-practicas">Buenas Prácticas</option>
+        @for (category of categories(); track category.id) {
+          <option [value]="category.slug">{{ category.name }}</option>
+        }
       </select>
     </div>
   </header>
@@ -35,18 +37,22 @@
 
     @if (totalPages() > 1) {
       <nav class="pagination">
-        <button (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 0">← Anterior</button>
+        <button (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 0">
+          ← Anterior
+        </button>
 
         @for (page of pageNumbers; track page) {
-          <button
-            (click)="goToPage(page)"
-            [class.active]="page === currentPage()"
-          >
+          <button (click)="goToPage(page)" [class.active]="page === currentPage()">
             {{ page + 1 }}
           </button>
         }
 
-        <button (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() === totalPages() - 1">Siguiente →</button>
+        <button
+          (click)="goToPage(currentPage() + 1)"
+          [disabled]="currentPage() === totalPages() - 1"
+        >
+          Siguiente →
+        </button>
       </nav>
     }
   }

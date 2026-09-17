@@ -1,0 +1,40 @@
+@if (isLoading()) {
+  <p class="state-message">Cargando...</p>
+} @else if (notFound()) {
+  <div class="state-message">
+    <p>No encontramos este artículo.</p>
+    <a routerLink="/articulos">Volver al listado</a>
+  </div>
+} @else if (article()) {
+  <article class="article-detail">
+    <a routerLink="/articulos" class="back-link">← Volver a artículos</a>
+
+    <span class="category">{{ article()!.category.name }}</span>
+    <h1>{{ article()!.title }}</h1>
+
+    <div class="meta">
+      <span>Por {{ article()!.author.firstName }} {{ article()!.author.lastName }}</span>
+      <span>⭐ {{ article()!.averageRating.toFixed(1) }}</span>
+      <span>💬 {{ article()!.commentsCount }}</span>
+      <span>👁 {{ article()!.viewsCount }}</span>
+    </div>
+
+    @if (article()!.images.length > 0) {
+      <div class="images">
+        @for (image of article()!.images; track image.id) {
+          <img [src]="'http://localhost:8080' + image.imageUrl" [alt]="image.altText" />
+        }
+      </div>
+    }
+
+    <div class="content">
+      {{ article()!.content }}
+    </div>
+    
+    <app-article-rating
+    [articleId]="article()!.id"
+    [initialAverage]="article()!.averageRating"/>
+
+    <app-comment-section [articleId]="article()!.id" />
+  </article>
+}
