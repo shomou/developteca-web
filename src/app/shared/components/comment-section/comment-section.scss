@@ -3,7 +3,7 @@
 
   h2 {
     font-size: 1.25rem;
-    color: #1e293b;
+    color: var(--color-heading);
     margin-bottom: 1rem;
   }
 }
@@ -16,24 +16,24 @@
 
   textarea {
     padding: 0.75rem;
-    border: 1px solid #cbd5e1;
-    border-radius: 0.5rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
     font-family: inherit;
     font-size: 0.95rem;
     resize: vertical;
 
     &:focus {
       outline: none;
-      border-color: #4f46e5;
+      border-color: var(--color-primary);
     }
   }
 
   button[type='submit'] {
     align-self: flex-start;
-    background: #4f46e5;
-    color: white;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
     border: none;
-    border-radius: 0.5rem;
+    border-radius: var(--radius-md);
     padding: 0.6rem 1.2rem;
     font-weight: 600;
     cursor: pointer;
@@ -49,16 +49,16 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background: #eef2ff;
-  color: #4338ca;
+  background: var(--color-primary-surface);
+  color: var(--color-primary-hover);
   padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
+  border-radius: var(--radius-md);
   font-size: 0.85rem;
 
   button {
     background: none;
     border: none;
-    color: #4338ca;
+    color: var(--color-primary-hover);
     text-decoration: underline;
     cursor: pointer;
     font-size: 0.8rem;
@@ -66,20 +66,20 @@
 }
 
 .error {
-  background: #fef2f2;
-  color: #b91c1c;
+  background: var(--color-danger-surface);
+  color: var(--color-danger);
   padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
+  border-radius: var(--radius-md);
   font-size: 0.875rem;
   margin: 0;
 }
 
 .login-hint,
 .state-message {
-  color: #64748b;
+  color: var(--color-text-muted);
   font-size: 0.9rem;
 
   a {
-    color: #4f46e5;
+    color: var(--color-primary);
   }
 }

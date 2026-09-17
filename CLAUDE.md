@@ -34,6 +34,14 @@ ng generate guard <path> --skip-tests
   - `shared/components/` — reusable components (e.g. `article-card`)
   - `features/public|auth|admin/` — page-level components grouped by area
 
+## Design tokens
+
+`src/styles.scss` defines the whole palette, radius scale and shadow scale as **CSS custom properties on `:root`** — deliberately not SCSS variables. Custom properties inherit through the DOM, so every component uses them with zero imports; SCSS variables would need a `@use` line in each `.scss` and one omission silently reintroduces hardcoded values. They're also runtime, so a future dark mode is just redefining the tokens under `@media (prefers-color-scheme: dark)`.
+
+**No component `.scss` should contain a raw hex color, a literal `border-radius` size, or a `box-shadow` value.** Use `var(--color-*)`, `var(--radius-*)`, `var(--shadow-*)`. Spacing (`padding`, `gap`, `margin`) is deliberately *not* tokenized — it legitimately varies per component and forcing a scale there adds noise without consistency gains.
+
+This was retrofitted after two generations of components had drifted apart: the earlier ones (`article-card`, `home`, `article-list`) used indigo-500 `#6366f1` and slate-900 `#0f172a`, while later ones used indigo-600 `#4f46e5` and slate-800 `#1e293b` — so the navbar and the pagination buttons were visibly different indigos. Radii had the same problem in two notations (`0.5rem` and `8px` are the same 8px). Everything is consolidated now; verify with `grep -rn "#[0-9a-fA-F]\{3,6\}" src/ --include=*.scss`, which should match only `styles.scss`.
+
 ## Angular 21 naming gotcha
 
 The CLI no longer appends a `.component` suffix to filenames or class names. `home.component.ts` / `HomeComponent` is now `home.ts` / `Home`. Applies to every generated artifact (components, guards, services, etc.) — don't manually add the old-style suffix when writing reference code.
@@ -85,7 +93,6 @@ The user is learning Angular hands-on and is intermediate level. Claude acts as 
 ### Not started
 - Sprint 5 — Newsletter (double opt-in, mass send)
 - Sprint 6 — Super Admin user management, extended stats, formal testing, deploy
-- Fase 9 — Centralized design system/SCSS tokens (styles currently per-component)
 - Fase 10 — Formal manual end-to-end test pass
 - "Artículos destacados" on Home has no real criterion yet (same query as "últimos")
 
