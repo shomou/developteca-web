@@ -35,6 +35,6 @@ export class CommentService {
   }
 
   delete(articleId: number, commentId: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl(articleId)}/${commentId}}`);
+    return this.http.delete<void>(`${this.apiUrl(articleId)}/${commentId}`);
   }
 }

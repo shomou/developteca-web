@@ -56,6 +56,16 @@ npm install
 npm start
 ```
 
+### Pruebas
+
+```bash
+npm test                  # 77 pruebas con Vitest
+```
+
+Cubren el pipe de Markdown (incluidos los bloques sin lenguaje y la gramática de PeopleCode), los servicios HTTP, el guard de administración y la lógica de los componentes de comentarios.
+
+Las pruebas de servicio comprueban el verbo y la URL exactos de cada petición. No es ceremonia: dos fallos reales fueron errores de una línea al construir la petición, invisibles para TypeScript y para una revisión de código, y ambos aparecieron la primera vez que se ejecutaron estas pruebas.
+
 Disponible en http://localhost:4200 con recarga en caliente.
 
 ```bash

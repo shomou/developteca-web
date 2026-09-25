@@ -34,6 +34,26 @@ ng generate guard <path> --skip-tests
   - `shared/components/` — reusable components (e.g. `article-card`)
   - `features/public|auth|admin/` — page-level components grouped by area
 
+## Testing
+
+77 tests with **Vitest** (Angular 21's default runner — not Karma/Jasmine), run with `ng test --watch=false`. Use `vi.spyOn`, not `jasmine.createSpy`.
+
+| Spec | Covers |
+|---|---|
+| `markdown.pipe.spec` | Fences with no language, unknown languages, PeopleCode grammar |
+| `comment.service.spec` | HTTP verbs, URLs, query params |
+| `article.service.spec` | Same, plus `FormData` upload |
+| `auth.service.spec` | Token/role persistence in `localStorage` |
+| `auth-guard.spec` | Authenticated **and** admin, both required |
+| `comment-item.spec` | Null-author handling, delete permission, moderation events |
+| `comment-section.spec` | Guest vs. registered submit, pending notice, pending count |
+
+**Service specs assert the exact verb and URL, and that is the point.** Two shipped bugs were single-line mistakes in request construction that TypeScript cannot catch (both are valid strings) and that a code review reads straight past: `http.patch` against a `@PutMapping` endpoint (surfaced as a confusing **403**, not 405, because `PATCH` isn't in the backend's CORS `setAllowedMethods`), and a stray brace in a template literal producing `/comments/3}` (a **400** from Spring failing to parse the path variable). Both were caught the first time these specs ran. Keep asserting verbs and URLs on every new service method.
+
+**The scaffold spec rots.** `app.spec.ts` still asserted `'Hello, developteca-web'` long after `app.html` was rewritten, and didn't provide `ActivatedRoute` for the navbar's `RouterLink` — so `ng test` failed outright and nobody noticed, because nothing ran it. Components created with `--skip-tests` leave no spec at all; add one when the component holds real logic.
+
+Components under test need `provideHttpClient()` + `provideHttpClientTesting()` (services inject `HttpClient`) and `provideRouter([])` when the template uses `routerLink`.
+
 ## Design tokens
 
 `src/styles.scss` defines the whole palette, radius scale and shadow scale as **CSS custom properties on `:root`** — deliberately not SCSS variables. Custom properties inherit through the DOM, so every component uses them with zero imports; SCSS variables would need a `@use` line in each `.scss` and one omission silently reintroduces hardcoded values. They're also runtime, so a future dark mode is just redefining the tokens under `@media (prefers-color-scheme: dark)`.
