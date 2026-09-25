@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-Angular 21 frontend (`developteca-web`) for Developteca, a public dev blog: public article browsing, comments/ratings for registered users, an admin dashboard, and a newsletter. Standalone components, Angular Signals, zoneless change detection, lazy-loaded routes. Consumes the `developteca-api` Spring Boot backend (sibling repo, see `../../api/developteca-api/CLAUDE.md`).
+Angular 21 frontend (`developteca-web`) for Developteca, a public dev blog: article browsing, comments (open to anyone, with review for guests), ratings for registered users, and an admin area for publishing and moderation. Standalone components, Angular Signals, zoneless change detection, lazy-loaded routes. Consumes the `developteca-api` Spring Boot backend (sibling repo, see `../../api/developteca-api/CLAUDE.md`).
 
 ## Commands
 
@@ -72,9 +72,7 @@ Components under test need `provideHttpClient()` + `provideHttpClientTesting()` 
 
 **PeopleCode has a custom grammar** (`shared/pipes/peoplecode.language.ts`, registered in the pipe as `peoplecode`, aliases `pcode`/`peoplesoft`) — highlight.js doesn't ship one. It's `case_insensitive` with `$pattern: /[A-Za-z_][\w-]*/` so hyphenated keywords (`End-If`, `When-Other`) match as one token. **A word may appear in only one keyword list**: with case-insensitivity, `string` (type) and `String()` (function) are the same token and the wrong list wins silently — this is why `String`/`Date`/`Time` are absent from `BUILT_INS` and `Value`/`Repeat`/`Throw` live in a single list each. When adding words, check for cross-list collisions first. Covers `&vars`, `%SystemVars`, `Record.X`-style definition references (`symbol`), `/* */`, `<* *>`, `/+ +/` and `REM ...;` comments, `""`-escaped strings, and `Function`/`Method`/`Class` names. Test grammar changes outside Angular with `node --experimental-strip-types` (Node 24 runs the `.ts` directly).
 
-**`angular.json` edits are not hot-reloaded.** Adding a stylesheet to `styles` (theme, fonts) only takes effect after restarting `ng serve` — the symptom is code blocks with correct `hljs-*` classes but no colors, or the font silently not loading. Installing new npm packages while `ng serve` runs also leaves Vite with a stale dep cache (`504 Outdated Optimize Dep`); a restart fixes both.
-
-This was retrofitted after two generations of components had drifted apart: the earlier ones (`article-card`, `home`, `article-list`) used indigo-500 `#6366f1` and slate-900 `#0f172a`, while later ones used indigo-600 `#4f46e5` and slate-800 `#1e293b` — so the navbar and the pagination buttons were visibly different indigos. Radii had the same problem in two notations (`0.5rem` and `8px` are the same 8px). Everything is consolidated now; verify with `grep -rn "#[0-9a-fA-F]\{3,6\}" src/ --include=*.scss`, which should match only `styles.scss`.
+**The token system was retrofitted** after two generations of components had drifted apart: the earlier ones (`article-card`, `home`, `article-list`) used indigo-500 `#6366f1` and slate-900 `#0f172a`, while later ones used indigo-600 `#4f46e5` and slate-800 `#1e293b` — so the navbar and the pagination buttons were visibly different indigos. Radii had the same problem in two notations (`0.5rem` and `8px` are the same 8px). Everything is consolidated now; verify with `grep -rn "#[0-9a-fA-F]\{3,6\}" src/ --include=*.scss`, which should match only `styles.scss`.
 
 ## Environments y despliegue
 
@@ -101,7 +99,7 @@ The CLI no longer appends a `.component` suffix to filenames or class names. `ho
 
 ## Backend integration
 
-- API base: `http://localhost:8080/api/v1`.
+- API base comes from `environment.apiUrl` — never hardcode it (see Environments).
 - All backend responses are wrapped in an `ApiResponse` envelope (`success`, `message`, `data`, `timestamp`, `errors`).
 - Auth is JWT bearer. `authInterceptor` (`core/interceptors/auth.interceptor.ts`) attaches the token — it only works if registered in `app.config.ts` via `provideHttpClient(withInterceptors([authInterceptor]))`. Forgetting this causes silent 401s on protected endpoints with no compile error.
 - `AuthService` holds the current user as a signal, persisted to `localStorage`.
@@ -115,7 +113,7 @@ The user is learning Angular hands-on and is intermediate level. Claude acts as 
 
 **Three stale-artifact traps, each of which has cost time more than once.** All three start cleanly while serving old code, so the symptom is always "the fix didn't work":
 - `docker compose up` without `--build` reuses the existing image. Confirm a rebuild took by checking the bundle hash changed: `curl -s http://localhost:4200/ | grep -o 'main-[A-Z0-9]*\.js'`.
-- `angular.json` edits (stylesheets, fonts, `fileReplacements`) are **not** hot-reloaded; `ng serve` must be restarted.
+- `angular.json` edits (stylesheets, fonts, `fileReplacements`) are **not** hot-reloaded; `ng serve` must be restarted. Installing npm packages while it runs also leaves Vite with a stale dep cache (`504 Outdated Optimize Dep`) — same fix.
 - A changed `.ts` *is* hot-reloaded, so a file edit and an `angular.json` edit applied together leave the app in a half-updated state — that's how the site once ran a dark code background with the light syntax theme still loaded.
 
 **Lazy chunks hide from naive greps.** `comment-section` and friends ship in the `article-detail` lazy chunk, not `main.js`. Searching only the bundles referenced from `index.html` will wrongly conclude a change isn't deployed; grep all of `/usr/share/nginx/html/*.js` instead.
@@ -151,7 +149,7 @@ Until this, the backend's full article CRUD had no UI — publishing was Insomni
 - `Comment.author` is `Author | null` in the model on purpose — it makes TypeScript flag every place that reads `author.firstName`, which is how the anonymous case gets handled everywhere instead of crashing at runtime. `comment-item` resolves the label through `displayName()`.
 - `moderateRequested` emits `{ comment, status }` rather than just the comment: with three statuses the target is no longer derivable from the current one (`PENDING` can go to either `APPROVED` or `REJECTED`).
 - **`CommentService.moderate` must use `http.put`, not `http.patch`.** It was `patch` and failed with a confusing **403**, not a 405: `PATCH` isn't in `setAllowedMethods` on the backend's CORS config, so Spring Security rejected the preflight before routing ever happened. When a call that should work returns 403, compare the verb against the backend's allowed methods before suspecting the token.
-- **Inline admin moderation**: `comment-section` passes `includeRejected: authService.isAdmin()` to `CommentService.list()`, so admins see hidden comments greyed out with an "Oculto" badge and a Restaurar/Ocultar toggle. `comment-item` emits `moderateRequested` with just the comment — the container derives the target status from `comment.status`, keeping the item component free of moderation state logic.
+- **Inline admin moderation**: `comment-section` passes `includeRejected: authService.isAdmin()` to `CommentService.list()`, so admins see pending and hidden comments in place, badged, with Aprobar/Rechazar/Ocultar buttons according to status.
 - `core/services/category.service.ts` + `categories` signal in `article-list`: the category `<select>` is now populated from `GET /api/v1/categories` instead of hardcoded slugs.
 
 ### Done — Sprint 3 complete
@@ -164,7 +162,7 @@ Until this, the backend's full article CRUD had no UI — publishing was Insomni
 - **`app.routes.ts`** — `''` (Home), `articulos`, `articulos/:slug`, `login`, `admin/dashboard` (guarded), wildcard → home
 - **Fase 5** — Home page (`features/public/home`)
 - **Fase 6** — Article list (`features/public/article-list`): pagination, 400ms debounced search, category filter (hardcoded slugs)
-- **Article detail** (`features/public/article-detail`) — reads `:slug` via `ActivatedRoute.paramMap`, renders content as plain text (`pre-wrap`, no `innerHTML`)
+- **Article detail** (`features/public/article-detail`) — reads `:slug` via `ActivatedRoute.paramMap` (subscribed, not `snapshot`, so navigating between articles reloads). Content rendering became Markdown later; see A6 below.
 - **Fase 8 — Admin dashboard** (`features/admin/dashboard`), backed by `StatsService` / `GET /articles/stats/dashboard`
 - `shared/components/article-card`
 - Full navigation manually tested: Home → Artículos → Detalle, and Login → Dashboard (admin)
