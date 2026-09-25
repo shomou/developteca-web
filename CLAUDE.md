@@ -15,8 +15,8 @@ ng serve
 # Build
 ng build
 
-# Run unit tests
-ng test
+# Run the 77 tests once (CI-style)
+ng test --watch=false
 
 # Generate a component/guard/service without spec files
 ng generate component <path> --skip-tests
@@ -109,11 +109,23 @@ The CLI no longer appends a `.component` suffix to filenames or class names. `ho
 
 ## Working methodology (important — read before writing code here)
 
-The user is learning Angular hands-on and is intermediate level. Claude acts as an **instructor/guide**: explain the concept, give reference code, and let the user implement it themselves in their own editor. Work through one phase ("sesión") at a time — the user implements, compiles/tests, and confirms before moving to the next phase. Don't bundle multiple phases into one response or skip ahead.
+The user is learning Angular hands-on and is intermediate level. Claude acts as an **instructor/guide**: explain the concept, give reference code, and let the user implement it themselves in their own editor. Work through one phase ("sesión") at a time — the user implements, compiles/tests, and confirms before moving to the next phase. Don't bundle multiple phases into one response or skip ahead. **Exception:** mechanical bulk work with no new concepts (find-and-replace refactors, config sweeps) they prefer done directly.
 
 **Before resuming work after any gap in the conversation, verify the actual files on disk** (find/read) rather than trusting this document's "done" status below — previously instructed changes (a whole login page, a guard, a navbar) were narrated as complete but never actually saved to disk before a migration, and the gap wasn't caught until files were checked directly.
 
-## Implementation status (source of truth: verified on disk 2026-09-17)
+**Three stale-artifact traps, each of which has cost time more than once.** All three start cleanly while serving old code, so the symptom is always "the fix didn't work":
+- `docker compose up` without `--build` reuses the existing image. Confirm a rebuild took by checking the bundle hash changed: `curl -s http://localhost:4200/ | grep -o 'main-[A-Z0-9]*\.js'`.
+- `angular.json` edits (stylesheets, fonts, `fileReplacements`) are **not** hot-reloaded; `ng serve` must be restarted.
+- A changed `.ts` *is* hot-reloaded, so a file edit and an `angular.json` edit applied together leave the app in a half-updated state — that's how the site once ran a dark code background with the light syntax theme still loaded.
+
+**Lazy chunks hide from naive greps.** `comment-section` and friends ship in the `article-detail` lazy chunk, not `main.js`. Searching only the bundles referenced from `index.html` will wrongly conclude a change isn't deployed; grep all of `/usr/share/nginx/html/*.js` instead.
+
+## Implementation status (source of truth: verified on disk 2026-09-25)
+
+### Done — Anonymous commenting
+- The comment form is public. Registered users post at `APPROVED`; guests post at `PENDING` and stay invisible until an admin approves them, which reuses the existing moderation UI instead of opening the blog to spam.
+- Guest fields (name required, email optional) plus a honeypot; `pendingNotice` tells the guest their comment is queued.
+- Admin sees `PENDING` items with Aprobar/Rechazar and a count of items awaiting review.
 
 ### Done — Bloque A: publishing from the web (admin area)
 Until this, the backend's full article CRUD had no UI — publishing was Insomnia-only.
@@ -162,11 +174,13 @@ Until this, the backend's full article CRUD had no UI — publishing was Insomni
 
 ### Not started
 - Sprint 5 — Newsletter (double opt-in, mass send)
-- Sprint 6 — Super Admin user management, extended stats, formal testing, deploy
-- Fase 10 — Formal manual end-to-end test pass
+- Sprint 6 — Super Admin user management, extended stats, deploy
+- Fase 10 — Manual end-to-end pass (77 automated tests exist, but nothing exercises the full browser flow)
+- CI — nothing runs the tests automatically; both suites had silently rotted before anyone noticed
 - "Artículos destacados" on Home has no real criterion yet (same query as "últimos")
 
 ## Related docs
 
 - Backend: `../../api/developteca-api/CLAUDE.md`
-- Full migration narrative (older session detail — cross-check against this file's Implementation status before trusting any "completado" claim): `../../CONTEXTO DEL PROYECTO — DEVELOPTE.txt`
+- Orchestration, Docker and environment variables: the backend repo's `README.md` (it holds `docker-compose.yml` for the whole stack)
+- `../../CONTEXTO DEL PROYECTO — DEVELOPTE.txt` is a pre-migration narrative kept for history only. It is **known to be wrong** about what was implemented — it claimed finished work that had never been saved to disk. Don't consult it for current state; this file and the code are authoritative.
