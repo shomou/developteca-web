@@ -1,42 +1,82 @@
 <section class="comments">
   <h2>Comentarios</h2>
 
-  @if (authService.isAuthenticated()) {
-    <form class="comment-form" (ngSubmit)="onSubmit()">
-      @if (replyingTo()) {
-        <div class="replying-banner">
-          Respondiendo a <strong>{{ replyingTo()!.author.firstName }}</strong>
-          <button type="button" (click)="cancelReply()">Cancelar</button>
-        </div>
-      }
+  <form class="comment-form" (ngSubmit)="onSubmit()">
+    @if (replyingTo()) {
+      <div class="replying-banner">
+        Respondiendo a
+        <strong>{{ replyingTo()!.author?.firstName ?? replyingTo()!.authorName }}</strong>
+        <button type="button" (click)="cancelReply()">Cancelar</button>
+      </div>
+    }
 
-      <textarea
-        name="newComment"
-        [(ngModel)]="newComment"
-        rows="3"
-        placeholder="Escribe tu comentario..."
-        required
-      ></textarea>
+    @if (!authService.isAuthenticated()) {
+      <div class="guest-fields">
+        <input
+          type="text"
+          name="authorName"
+          [(ngModel)]="authorName"
+          placeholder="Tu nombre *"
+          maxlength="100"
+          required
+        />
+        <input
+          type="email"
+          name="authorEmail"
+          [(ngModel)]="authorEmail"
+          placeholder="Tu email (opcional, no se publica)"
+          maxlength="255"
+        />
+      </div>
 
-      @if (errorMessage()) {
-        <p class="error">{{ errorMessage() }}</p>
-      }
+      <!-- Honeypot: invisible para personas, tentador para bots.
+         No usa type="hidden" porque muchos bots ignoran esos campos. -->
+      <input
+        type="text"
+        name="website"
+        [(ngModel)]="website"
+        class="hp-field"
+        tabindex="-1"
+        autocomplete="off"
+        aria-hidden="true"
+      />
+    }
 
-      <button type="submit" [disabled]="isSubmitting()">
-        {{ isSubmitting() ? 'Publicando...' : 'Publicar comentario' }}
-      </button>
-    </form>
-  } @else {
-    <p class="login-hint">
-      <a routerLink="/login">Inicia sesión</a> para dejar un comentario.
-    </p>
-  }
+    <textarea
+      name="newComment"
+      [(ngModel)]="newComment"
+      rows="3"
+      placeholder="Escribe tu comentario..."
+      required
+    ></textarea>
+
+    @if (errorMessage()) {
+      <p class="error">{{ errorMessage() }}</p>
+    }
+
+    @if (pendingNotice()) {
+      <p class="pending-notice">Gracias. Tu comentario se publicará en cuanto lo revisemos.</p>
+    }
+
+    <button type="submit" [disabled]="isSubmitting()">
+      {{ isSubmitting() ? 'Publicando...' : 'Publicar comentario' }}
+    </button>
+
+    @if (!authService.isAuthenticated()) {
+      <p class="login-hint">
+        <a routerLink="/login">Inicia sesión</a> y tu comentario se publicará al instante.
+      </p>
+    }
+  </form>
 
   @if (isLoading()) {
     <p class="state-message">Cargando comentarios...</p>
   } @else if (comments().length === 0) {
     <p class="state-message">Todavía no hay comentarios. ¡Sé el primero!</p>
   } @else {
+    @if (authService.isAdmin() && pendingCount() > 0) {
+      <p class="pending-summary">{{ pendingCount() }} comentario(s) esperando revisión.</p>
+    }
     <div class="comment-list">
       @for (comment of comments(); track comment.id) {
         <app-comment-item

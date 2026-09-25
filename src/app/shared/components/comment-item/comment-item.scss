@@ -42,6 +42,10 @@
       &.danger {
         color: var(--color-danger);
       }
+      .approve {
+        color: var(--color-success);
+        font-weight: 600;
+      }
     }
   }
 
@@ -51,7 +55,7 @@
     border-left: 2px solid var(--color-primary-surface);
   }
 
-    &.is-hidden {
+  &.is-hidden {
     opacity: 0.55;
 
     .content {
@@ -66,6 +70,24 @@
     font-weight: 600;
     padding: 0.1rem 0.45rem;
     border-radius: var(--radius-lg);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .anon-badge {
+    background: var(--color-surface-sunken);
+    color: var(--color-text-muted);
+    font-size: 0.7rem;
+    padding: 0.1rem 0.45rem;
+    border-radius: var(--radius-pill);
+  }
+
+  .pending-badge {
+    background: var(--color-warning-surface);
+    color: var(--color-warning);
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.1rem 0.45rem;
+    border-radius: var(--radius-pill);
     text-transform: uppercase;
     letter-spacing: 0.03em;
   }

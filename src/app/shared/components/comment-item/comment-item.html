@@ -1,7 +1,13 @@
 <div class="comment" [class.is-hidden]="isHidden()">
   <div class="comment-header">
-    <span class="author">{{ comment.author.firstName }} {{ comment.author.lastName }}</span>
+    <span class="author">{{ displayName() }}</span>
+    @if (isAnonymous()) {
+      <span class="anon-badge">invitado</span>
+    }
     <span class="date">{{ comment.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+    @if (isPending()) {
+      <span class="pending-badge">Pendiente</span>
+    }
     @if (isHidden()) {
       <span class="hidden-badge">Oculto</span>
     }
@@ -15,9 +21,14 @@
     }
 
     @if (authService.isAdmin()) {
-      <button type="button" (click)="moderateRequested.emit(comment)">
-        {{ isHidden() ? 'Restaurar' : 'Ocultar' }}
-      </button>
+      @if (isPending()) {
+        <button type="button" class="approve" (click)="approve()">Aprobar</button>
+        <button type="button" (click)="reject()">Rechazar</button>
+      } @else if (isHidden()) {
+        <button type="button" class="approve" (click)="approve()">Restaurar</button>
+      } @else {
+        <button type="button" (click)="reject()">Ocultar</button>
+      }
     }
 
     @if (canDelete()) {

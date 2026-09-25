@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output, forwardRef } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { Comment } from '../../../core/models/comment.model';
+import { Comment, CommentStatus } from '../../../core/models/comment.model';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -11,21 +11,45 @@ import { AuthService } from '../../../core/services/auth.service';
   styleUrl: './comment-item.scss',
 })
 export class CommentItem {
-  @Input({required: true}) comment!: Comment;
+  @Input({ required: true }) comment!: Comment;
 
   @Output() replyRequested = new EventEmitter<Comment>();
   @Output() deleteRequested = new EventEmitter<Comment>();
-  @Output() moderateRequested = new EventEmitter<Comment>();
+  @Output() moderateRequested = new EventEmitter<{ comment: Comment; status: CommentStatus }>();
 
-  constructor(public authService: AuthService){}
+  constructor(public authService: AuthService) {}
 
-  canDelete(): boolean{
+  canDelete(): boolean {
     const user = this.authService.currentUser();
     if (!user) return false;
-    return user.id === this.comment.author.id || this.authService.isAdmin();
+    if (this.authService.isAdmin()) return true;
+    return this.comment.author !== null && user.id === this.comment.author.id;
   }
 
-  isHidden(): boolean{
+  isHidden(): boolean {
     return this.comment.status === 'REJECTED';
+  }
+
+  displayName(): string {
+    if (this.comment.author) {
+      return `${this.comment.author.firstName} ${this.comment.author.lastName}`;
+    }
+    return this.comment.authorName ?? 'Anónimo';
+  }
+
+  isAnonymous(): boolean {
+    return this.comment.author === null;
+  }
+
+  isPending(): boolean {
+    return this.comment.status === 'PENDING';
+  }
+
+  approve(): void {
+    this.moderateRequested.emit({ comment: this.comment, status: 'APPROVED' });
+  }
+
+  reject(): void {
+    this.moderateRequested.emit({ comment: this.comment, status: 'REJECTED' });
   }
 }

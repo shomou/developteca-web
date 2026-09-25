@@ -83,3 +83,51 @@
     color: var(--color-primary);
   }
 }
+
+.guest-fields {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+
+  input {
+    flex: 1 1 200px;
+    padding: 0.55rem 0.8rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+  }
+}
+
+// El honeypot debe ser invisible sin usar display:none ni visibility:hidden,
+// porque muchos bots detectan esas reglas y omiten el campo.
+.hp-field {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pending-notice {
+  background: var(--color-warning-surface);
+  color: var(--color-warning);
+  padding: 0.6rem 0.9rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.pending-summary {
+  background: var(--color-warning-surface);
+  color: var(--color-warning);
+  padding: 0.5rem 0.8rem;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  margin: 0 0 1rem;
+}

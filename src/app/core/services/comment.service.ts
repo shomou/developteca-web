@@ -6,29 +6,35 @@ import { ApiResponse } from '../models/api-response.model';
 import { Comment, CommentCreateRequest, CommentStatus } from '../models/comment.model';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root',
 })
 export class CommentService {
-    constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {}
 
-    private apiUrl(articleId: number): string{
-        return `${environment.apiUrl}/articles/${articleId}/comments`;
-    } 
+  private apiUrl(articleId: number): string {
+    return `${environment.apiUrl}/articles/${articleId}/comments`;
+  }
 
-    list(articleId: number, includeRejected = false): Observable<ApiResponse<Comment[]>> {
-        const params =  new HttpParams().set('includeRejected', includeRejected);
-        return this.http.get<ApiResponse<Comment[]>>(this.apiUrl(articleId), {params});
-    }
+  list(articleId: number, includeRejected = false): Observable<ApiResponse<Comment[]>> {
+    const params = new HttpParams().set('includeRejected', includeRejected);
+    return this.http.get<ApiResponse<Comment[]>>(this.apiUrl(articleId), { params });
+  }
 
-    create(articleId:number, request: CommentCreateRequest): Observable<ApiResponse<Comment>> {
-        return this.http.post<ApiResponse<Comment>>(this.apiUrl(articleId),request);
-    }
+  create(articleId: number, request: CommentCreateRequest): Observable<ApiResponse<Comment>> {
+    return this.http.post<ApiResponse<Comment>>(this.apiUrl(articleId), request);
+  }
 
-    moderate(articleId: number, commentId: number, status: CommentStatus): Observable<ApiResponse<Comment>>{
-        return this.http.patch<ApiResponse<Comment>>(`${this.apiUrl(articleId)}/${commentId}/moderate`, { status });
-    }
+  moderate(
+    articleId: number,
+    commentId: number,
+    status: CommentStatus,
+  ): Observable<ApiResponse<Comment>> {
+    return this.http.put<ApiResponse<Comment>>(`${this.apiUrl(articleId)}/${commentId}/moderate`, {
+      status,
+    });
+  }
 
-    delete(articleId: number, commentId: number): Observable<void>{
-        return this.http.delete<void>(`${this.apiUrl(articleId)}/${commentId}}`);
-    }
+  delete(articleId: number, commentId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl(articleId)}/${commentId}}`);
+  }
 }
