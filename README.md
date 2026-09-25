@@ -1,59 +1,88 @@
-# DeveloptecaWeb
+# developteca-web
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.12.
+Frontend de **Developteca**, un blog de desarrollo de software. SPA en Angular 21 que consume la [API en Spring Boot](../../api/developteca-api).
 
-## Development server
+## Stack
 
-To start a local development server, run:
+- **Angular 21** — componentes *standalone*, sin NgModules
+- **Signals** para el estado, en lugar de `BehaviorSubject`
+- **Zoneless change detection** (`provideZonelessChangeDetection`) — sin `zone.js`
+- **Lazy loading** de rutas con `loadComponent`
+- **SCSS** con *design tokens* como custom properties de CSS
+- **marked + highlight.js** para renderizar Markdown con resaltado de sintaxis
 
-```bash
-ng serve
+## Funcionalidades
+
+**Público**
+- Listado de artículos paginado, con búsqueda con *debounce* y filtro por categoría
+- Detalle del artículo con Markdown renderizado y resaltado de código
+- Comentarios anidados de profundidad arbitraria
+- Calificación de 1 a 5 estrellas
+
+**Administración** (protegido con guard por rol)
+- Panel con métricas
+- Gestión de artículos: listado con todos los estados, crear, editar, eliminar
+- Gestión de imágenes por artículo, con imagen destacada
+- Moderación de comentarios en línea (ocultar y restaurar)
+
+## Ejecución con Docker (recomendado)
+
+El `docker-compose.yml` que levanta todo el proyecto (este frontend, la API, PostgreSQL y Mailpit) vive en el [repositorio de la API](https://github.com/shomou/developteca-api), y construye este repo como hermano. La estructura esperada es:
+
+```
+developteca/
+├── api/developteca-api    <- github.com/shomou/developteca-api (contiene el compose)
+└── web/developteca-web    <- este repositorio
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
 ```bash
-ng generate component component-name
+mkdir -p developteca/api developteca/web && cd developteca
+git clone https://github.com/shomou/developteca-api.git api/developteca-api
+git clone https://github.com/shomou/developteca-web.git web/developteca-web
+cd api/developteca-api && cp .env.example .env    # edita los valores
+docker compose up -d --build
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Disponible en http://localhost:4200. No necesitas Node instalado.
+
+La imagen es *multi-stage*: Node y `node_modules` se usan solo para compilar; la imagen final es nginx sirviendo los estáticos (~95 MB frente a ~400 MB). La configuración de nginx incluye `try_files ... /index.html`, necesario para que el enrutamiento del lado del cliente sobreviva a una recarga en rutas profundas.
+
+## Desarrollo local
+
+Requiere Node 20+ y la API corriendo en `http://localhost:8080`.
 
 ```bash
-ng generate --help
+npm install
+npm start
 ```
 
-## Building
-
-To build the project run:
+Disponible en http://localhost:4200 con recarga en caliente.
 
 ```bash
-ng build
+npm run build     # compila a dist/developteca-web/browser
+npm test          # pruebas unitarias
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Estructura
 
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
+```
+src/app/
+├── core/          servicios, guards, interceptores y modelos
+├── shared/        componentes reutilizables y el pipe de Markdown
+└── features/
+    ├── public/    home, listado y detalle de artículos
+    ├── auth/      login
+    └── admin/     dashboard, gestión de artículos e imágenes
 ```
 
-## Running end-to-end tests
+## Notas de implementación
 
-For end-to-end (e2e) testing, run:
+**Design tokens.** Toda la paleta, radios y sombras son custom properties de CSS en `src/styles.scss`, no variables SCSS: se heredan por el DOM, así que están disponibles en cualquier componente sin importar nada, y permitirían un modo oscuro redefiniéndolas.
 
-```bash
-ng e2e
-```
+**Resaltado de código.** Solo se registran los lenguajes que el blog usa, en lugar de importar highlight.js completo (~1 MB). Incluye una **gramática propia de PeopleCode**, que highlight.js no trae.
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+**Nomenclatura.** Angular 21 ya no añade el sufijo `.component`: `home.ts` con la clase `Home`.
 
-## Additional Resources
+## Pendiente
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+La URL de la API está fija en `http://localhost:8080`. Externalizarla con los *environments* de Angular es el siguiente paso para poder desplegar en un entorno real.

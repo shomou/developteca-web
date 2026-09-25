@@ -1,0 +1,12 @@
+# node_modules pesa 322MB y se reinstala dentro de la imagen desde package-lock.json.
+# Enviarlo al daemon haría el build lentísimo (y traería binarios del host).
+node_modules/
+dist/
+.angular/
+
+.git/
+.gitignore
+.vscode/
+.idea/
+
+CLAUDE.md
