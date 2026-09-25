@@ -21,7 +21,7 @@
     @if (article()!.images.length > 0) {
       <div class="images">
         @for (image of article()!.images; track image.id) {
-          <img [src]="'http://localhost:8080' + image.imageUrl" [alt]="image.altText" />
+          <img [src]="serverUrl + image.imageUrl" [alt]="image.altText" />
         }
       </div>
     }

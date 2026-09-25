@@ -56,6 +56,25 @@ ng generate guard <path> --skip-tests
 
 This was retrofitted after two generations of components had drifted apart: the earlier ones (`article-card`, `home`, `article-list`) used indigo-500 `#6366f1` and slate-900 `#0f172a`, while later ones used indigo-600 `#4f46e5` and slate-800 `#1e293b` — so the navbar and the pagination buttons were visibly different indigos. Radii had the same problem in two notations (`0.5rem` and `8px` are the same 8px). Everything is consolidated now; verify with `grep -rn "#[0-9a-fA-F]\{3,6\}" src/ --include=*.scss`, which should match only `styles.scss`.
 
+## Environments y despliegue
+
+`src/environments/environment.ts` es el **de producción** (es el archivo base) y `environment.development.ts` lo sustituye vía `fileReplacements` en la configuración `development` de `angular.json`. Es al revés de lo que suele esperarse, y es correcto: `defaultConfiguration` es `production`, así que compilar sin indicar nada produce la versión segura.
+
+Ambos derivan `apiUrl` de una única constante `serverUrl`. Producción usa `serverUrl = ''`, de modo que `apiUrl` queda como la ruta **relativa** `/api/v1`: el bundle no contiene ningún host, no hay que recompilar por dominio, y al compartir origen con la API **CORS no interviene**. Desarrollo usa `http://localhost:8080` porque con `ng serve` no hay proxy delante.
+
+Las imágenes necesitan `serverUrl` (no `apiUrl`) porque el backend las expone en `/uploads/**`, fuera de `/api/v1`. Como una plantilla no puede importar nada, los componentes que las muestran publican `readonly serverUrl = environment.serverUrl` para el HTML.
+
+**Nunca escribas una URL de API literal en un servicio o plantilla** — rompería el despliegue de forma silenciosa. Comprobación: `grep -rn "localhost:8080" src --include=*.ts --include=*.html | grep -v environments` debe salir vacío.
+
+### nginx como proxy inverso
+
+`nginx.conf` reenvía `/api/` y `/uploads/` al contenedor `api`, que es lo que hace viable la ruta relativa dentro de Docker. Dos detalles que costaron un bug cada uno:
+
+- **`location ^~ /uploads/`** — el `^~` es obligatorio. nginx evalúa los `location` con expresión regular **antes** que los de prefijo, así que sin él una ruta como `/uploads/articles/1/foto.png` cae en el bloque de caché de estáticos (`~* \.(png|...)$`), se busca en el disco de nginx y devuelve 404. Las imágenes suben bien y luego no se ven.
+- **`client_max_body_size 6M`** — el límite por defecto de nginx es 1MB y rechaza las subidas con 413 antes de alcanzar al backend. Hay tres límites encadenados (nginx, `spring.servlet.multipart`, `app.upload.max-file-size`) y gana el más bajo.
+
+El contenedor compila con la configuración **production** de Angular aunque el backend corra con perfil `dev`: son ejes independientes. La de Angular controla minificación y qué environment se compila, no en qué entorno se ejecuta; servir por nginx un bundle sin optimizar (1,39 MB frente a 292 kB) no tiene sentido.
+
 ## Angular 21 naming gotcha
 
 The CLI no longer appends a `.component` suffix to filenames or class names. `home.component.ts` / `HomeComponent` is now `home.ts` / `Home`. Applies to every generated artifact (components, guards, services, etc.) — don't manually add the old-style suffix when writing reference code.

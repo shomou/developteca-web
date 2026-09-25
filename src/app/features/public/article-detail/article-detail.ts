@@ -5,6 +5,7 @@ import { ArticleDetail as ArticleDetailModel } from '../../../core/models/articl
 import { CommentSection } from '../../../shared/components/comment-section/comment-section';
 import { ArticleRating } from '../../../shared/components/article-rating/article-rating';
 import { MarkdownPipe } from '../../../shared/pipes/markdown.pipe';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-article-detail',
@@ -14,6 +15,7 @@ import { MarkdownPipe } from '../../../shared/pipes/markdown.pipe';
   styleUrl: './article-detail.scss',
 })
 export class ArticleDetail implements OnInit {
+  readonly serverUrl = environment.serverUrl;
   article = signal<ArticleDetailModel | null>(null);
   isLoading = signal(true);
   notFound = signal(false);

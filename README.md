@@ -83,6 +83,13 @@ src/app/
 
 **Nomenclatura.** Angular 21 ya no añade el sufijo `.component`: `home.ts` con la clase `Home`.
 
-## Pendiente
+## Configuración por entorno
 
-La URL de la API está fija en `http://localhost:8080`. Externalizarla con los *environments* de Angular es el siguiente paso para poder desplegar en un entorno real.
+La URL de la API no está fija en el código. `src/environments/environment.ts` (producción) y `environment.development.ts` se intercambian en tiempo de compilación mediante `fileReplacements`.
+
+| | `serverUrl` | Cuándo |
+|---|---|---|
+| Producción | `''` → API en `/api/v1` (ruta relativa) | Build del contenedor, detrás de nginx |
+| Desarrollo | `http://localhost:8080` | `ng serve`, sin proxy delante |
+
+Con la ruta relativa el bundle no contiene ningún dominio: la misma imagen se despliega en cualquier host sin recompilar, y como el frontend y la API comparten origen, **CORS deja de intervenir**. En Docker, nginx reenvía `/api/` y `/uploads/` al contenedor del backend.

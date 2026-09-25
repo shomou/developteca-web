@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../models/api-response.model';
@@ -9,7 +10,7 @@ export class RatingService {
   constructor(private http: HttpClient) {}
 
   private apiUrl(articleId: number): string {
-    return `http://localhost:8080/api/v1/articles/${articleId}/ratings`;
+    return `${environment.apiUrl}/articles/${articleId}/ratings`;
   }
 
   rate(articleId: number, value: number): Observable<ApiResponse<RatingResponse>> {

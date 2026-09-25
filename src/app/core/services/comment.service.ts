@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../models/api-response.model';
@@ -11,7 +12,7 @@ export class CommentService {
     constructor(private http: HttpClient) {}
 
     private apiUrl(articleId: number): string{
-        return `http://localhost:8080/api/v1/articles/${articleId}/comments`;
+        return `${environment.apiUrl}/articles/${articleId}/comments`;
     } 
 
     list(articleId: number, includeRejected = false): Observable<ApiResponse<Comment[]>> {

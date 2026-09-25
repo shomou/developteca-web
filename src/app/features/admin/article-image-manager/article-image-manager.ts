@@ -2,6 +2,7 @@ import { Component, Input, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ArticleService } from '../../../core/services/article.service';
 import { ArticleImage } from '../../../core/models/article.model';
+import { environment } from '../../../../environments/environment';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_SIZE_BYTES = 5 * 1024 * 1024;
@@ -16,7 +17,7 @@ const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 export class ArticleImageManager implements OnInit {
   @Input({ required: true }) articleId!: number;
 
-  readonly apiBase = 'http://localhost:8080';
+  readonly apiBase = environment.serverUrl;
 
   images = signal<ArticleImage[]>([]);
   isUploading = signal(false);
